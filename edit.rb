@@ -6,9 +6,10 @@
 # %meta{:content => "#{current_page.source_file}", :name => "source"}
 #
 #
+  # TODO RÄCKER RADEN OVAN? FINNS DET VERKLIGEN ALLTID EN SOURCE_FILE? I O F S FICK JAG INGA PROTESTER SOM JAG SÅG!!!!!
+  #NÄR JAG BYGGDE. BÄTTRE MED HELPER? ELLER SKA JAG UTGÅ FRÅN ATT DEN ALLTID FINNS NU, MEN ATT DET
+  #EV. KAN VARA SÅ ATT DEN IBLAND ÄR TOM?
 
-
-#require 'uri'
 require 'logger'
 require 'fileutils'
 require 'pathname'
@@ -26,7 +27,7 @@ $LOG.info 'STARTING middleman-edit'
 # (Code for other browsers can be found here:
 # https://gist.github.com/vitorgalvao/5392178#file-get_title_and_url-applescript )
 script = "tell application \"Google Chrome\" to get URL of active tab of first window"
-url = `osascript -e '#{script}'`
+url = %x{osascript -e '#{script}'}
 $LOG.info "Trying to edit #{url}, from Chrome"
 
 # Strip \n
@@ -66,9 +67,7 @@ script = "tell application \"Finder\" to activate"
 `osascript -e '#{script}'`
 =end
 
-# Open the source file
-script = "tell application \"Finder\" to open (POSIX file \"#{source}\")"
-`osascript -e '#{script}'`
-
+# Open the source file with TextMate
+%x{mate #{source}}
 
 
