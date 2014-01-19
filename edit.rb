@@ -15,7 +15,7 @@ require 'terminal-notifier'  # http://rubygems.org/gems/terminal-notifier
 # Setup logging
 logpath = File.expand_path('~/Library/Logs/Middleman/Edit/edit.log')
 FileUtils.mkdir_p(File.dirname(logpath))
-$LOG = Logger.new(logpath, 'daily')
+$LOG = Logger.new(logpath, 'monthly')
 $LOG.level = Logger::DEBUG
 $LOG.info '==============================================================='
 $LOG.info 'STARTING middleman-edit'
@@ -26,10 +26,12 @@ $LOG.info 'STARTING middleman-edit'
 #
 # (Code for other browsers can be found here:
 # https://gist.github.com/vitorgalvao/5392178#file-get_title_and_url-applescript )
+#
 script = "tell application \"Google Chrome\" to get URL of active tab of front window"
 #script = "tell application \"Safari\" to return URL of front document"
 url = %x{osascript -e '#{script}'}
-$LOG.info "Trying to edit #{url}, from Chrome"
+$LOG.info "URL: #{url}"
+TerminalNotifier.notify(url, :title => 'Middleman edit', :subtitle => "TEST")
 
 # Strip \n
 url.chomp!
@@ -37,7 +39,7 @@ url.chomp!
 
 # Get the page's html code
 html = ''
-open(url) do |f|
+open(url) do |f|                    # TODO Handle 404
   html = f.read
   TerminalNotifier.notify(url, :title => 'Middleman edit', :subtitle => "Unable to get page")
   $LOG.warn "Unable to get #{url}" if html.empty?
@@ -101,7 +103,7 @@ end
 
 # Open the source file (Uncomment the option that suits you best.)
 TerminalNotifier.notify(source, :title => 'Middleman edit', :subtitle => "Opening source file")
-$LOG.info "Opening #{source}?
+$LOG.info "Opening #{source}?"
 
 %x{open #{source}}      # Default application
 
