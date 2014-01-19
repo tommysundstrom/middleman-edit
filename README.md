@@ -3,6 +3,9 @@ middleman-edit
 
 (Mac only) Opens the Middleman source file of the page currently in the web browser, making it quick to edit the text.
 
+Currently takes the page from Chrome and opens the source with TextMate, but this is easy to change by commenting
+in/out lines in the code.
+
 Works both with the development server and on the final site.
 
 Use [Alfred](http://www.alfredapp.com/), or any other of numerous options to run this script from a hotkey. Or
