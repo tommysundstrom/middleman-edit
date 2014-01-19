@@ -24,3 +24,12 @@ For this script to work, there must be a meta tag with the location of the sourc
 
 * Uses AppleScript, so works only on Mac
 * [Terminal Notifier](http://rubygems.org/gems/terminal-notifier)
+
+Note. The Run Script action i Alfred is using the system Ruby installation, so to install Terminal Notifier
+ you need to do
+ ```
+ rvm use system
+ sudo gem install terminal-notifier
+ rvm use default
+ ```
+
