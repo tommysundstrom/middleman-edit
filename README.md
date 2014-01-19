@@ -1,7 +1,7 @@
 middleman-edit
 ==============
 
-(Mac only) Open the Middleman source file of the page currently in the web browser, thus making it easy to edit the text.
+(Mac only) Opens the Middleman source file of the page currently in the web browser, making it quick to edit the text.
 
 Works both with the development server and on the final site.
 
