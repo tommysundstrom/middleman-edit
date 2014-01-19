@@ -65,15 +65,17 @@ end
 
 # Open the source file (Uncomment the option that suits you best.)
 
-#%x{open #{source}}     # Default application
+%x{open #{source}}      # Default application
 
-%x{mate #{source}}      # TextMate
+#%x{mate #{source}}     # TextMate
 
 #%x{mvim #{source}}     # MacVim
 
 #%x{bbedit #{source}}   # BBEdit
 
 #%x{open -a TheApplication #{source}}     # Replace AnApplication with the application you want to use
+
+#%x{open -a MarkdownLife #{source}}       # MarkdownLife
 
 # %x{open -a RubyMine #{source}}    # RubyMine (for more advanced options,
           # see https://www.jetbrains.com/ruby/webhelp/working-with-rubymine-features-from-command-line.html )
