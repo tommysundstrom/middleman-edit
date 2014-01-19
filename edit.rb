@@ -31,7 +31,6 @@ script = "tell application \"Google Chrome\" to get URL of active tab of front w
 #script = "tell application \"Safari\" to return URL of front document"
 url = %x{osascript -e '#{script}'}
 $LOG.info "URL: #{url}"
-TerminalNotifier.notify(url, :title => 'Middleman edit', :subtitle => "TEST")
 
 # Strip \n
 url.chomp!
@@ -41,9 +40,11 @@ url.chomp!
 html = ''
 open(url) do |f|                    # TODO Handle 404
   html = f.read
-  TerminalNotifier.notify(url, :title => 'Middleman edit', :subtitle => "Unable to get page")
-  $LOG.warn "Unable to get #{url}" if html.empty?
-  raise "Unable to get #{url}" if html.empty?
+  if html.empty?
+    TerminalNotifier.notify(url, :title => 'Middleman edit', :subtitle => "Unable to get page")
+    $LOG.warn "Unable to get #{url}"
+    raise "Unable to get #{url}"
+  end
 end
 
 
@@ -61,9 +62,11 @@ end
 
 result = meta_source_tag.match( /content\s*=\s*['"](.*?)['"]/ )
 if result.nil?
-  TerminalNotifier.notify(url, :title => 'Middleman edit', :subtitle => "Unable to extract content from source tag")
-  $LOG.warn "Found source meta for #{url}, but can not extract content" if source.empty?
-  raise "Found source meta for #{url}, but can not extract content" if source.empty?
+  if source.empty?
+    TerminalNotifier.notify(url, :title => 'Middleman edit', :subtitle => "Unable to extract content from source tag")
+    $LOG.warn "Found source meta for #{url}, but can not extract content"
+    raise "Found source meta for #{url}, but can not extract content"
+  end
 else
   source = result[1]
 end
@@ -76,7 +79,7 @@ unless File.exist?(source)
   source_found = false
   path.ascend do |ancestor|
     next unless ancestor.exist?
-    if ancestor.basename == 'source'
+    if ancestor.basename.to_s == 'source'
       maybe_middleman = true
       if (ancestor + '_WARNING - This site is slimmed for development.lock').exist?
         # The site has been slimmed down by middleman-slim-the-site.
@@ -87,13 +90,15 @@ unless File.exist?(source)
           FileUtils.copy_entry(backup_source, source)
           source = backup_source
           source_found = true
+          TerminalNotifier.notify(source, :title => 'Middleman edit', :subtitle => "Found source in backup. Copied back to site")
+          $LOG.info "Found source #{source} in backup. Copied back to site"
           break
         end
       end
     end
   end
   unless source_found
-    errmsg "Can't find file #{source}"
+    errmsg = "Can't find file #{source}"
     TerminalNotifier.notify(source, :title => 'Middleman edit', :subtitle => "Unable to find the source")
     $LOG.warn errmsg
     raise errmsg
