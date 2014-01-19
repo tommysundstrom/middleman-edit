@@ -22,9 +22,12 @@ $LOG.info 'STARTING middleman-edit'
 
 
 # Chrome version
+# (If you are using Safari, uncomment that line)
+#
 # (Code for other browsers can be found here:
 # https://gist.github.com/vitorgalvao/5392178#file-get_title_and_url-applescript )
-script = "tell application \"Google Chrome\" to get URL of active tab of first window"
+script = "tell application \"Google Chrome\" to get URL of active tab of front window"
+#script = "tell application \"Safari\" to return URL of front document"
 url = %x{osascript -e '#{script}'}
 $LOG.info "Trying to edit #{url}, from Chrome"
 
@@ -37,7 +40,8 @@ html = ''
 open(url) do |f|
   html = f.read
   TerminalNotifier.notify(url, :title => 'Middleman edit', :subtitle => "Unable to get page")
-  raise "Unable to download #{url}" if html.empty?
+  $LOG.warn "Unable to get #{url}" if html.empty?
+  raise "Unable to get #{url}" if html.empty?
 end
 
 
@@ -56,14 +60,48 @@ end
 result = meta_source_tag.match( /content\s*=\s*['"](.*?)['"]/ )
 if result.nil?
   TerminalNotifier.notify(url, :title => 'Middleman edit', :subtitle => "Unable to extract content from source tag")
-  raise "Found source meta for #{url}, can not extract content" if source.empty?
+  $LOG.warn "Found source meta for #{url}, but can not extract content" if source.empty?
+  raise "Found source meta for #{url}, but can not extract content" if source.empty?
 else
   source = result[1]
 end
 
+# Check that the source file exist
+unless File.exist?(source)
+  # Check if the site has been slimmed down for development, see https://github.com/tommysundstrom/middleman-slim-the-site
+  #       (Checks parent folders for a directory named 'source'. This is NOT the same as the variable source)
+  path = Pathname.new(source).parent
+  source_found = false
+  path.ascend do |ancestor|
+    next unless ancestor.exist?
+    if ancestor.basename == 'source'
+      maybe_middleman = true
+      if (ancestor + '_WARNING - This site is slimmed for development.lock').exist?
+        # The site has been slimmed down by middleman-slim-the-site.
+        # Looking for the file in the backup, and if found, moving it back into the site.
+        backup_source = source.sub('/source/', '/source_unslimmed_copy/')
+        if File.exist?(backup_source)
+          # The file exist, but has been slimmed away. Moving it back.
+          FileUtils.copy_entry(backup_source, source)
+          source = backup_source
+          source_found = true
+          break
+        end
+      end
+    end
+  end
+  unless source_found
+    errmsg "Can't find file #{source}"
+    TerminalNotifier.notify(source, :title => 'Middleman edit', :subtitle => "Unable to find the source")
+    $LOG.warn errmsg
+    raise errmsg
+  end
+end
 
 
 # Open the source file (Uncomment the option that suits you best.)
+TerminalNotifier.notify(source, :title => 'Middleman edit', :subtitle => "Opening source file")
+$LOG.info "Opening #{source}?
 
 %x{open #{source}}      # Default application
 
