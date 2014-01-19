@@ -4,11 +4,7 @@
 # in the page. Add this line inside <head> (haml version):
 #
 # %meta{:content => "#{current_page.source_file}", :name => "source"}
-#
-#
-  # TODO RÄCKER RADEN OVAN? FINNS DET VERKLIGEN ALLTID EN SOURCE_FILE? I O F S FICK JAG INGA PROTESTER SOM JAG SÅG!!!!!
-  #NÄR JAG BYGGDE. BÄTTRE MED HELPER? ELLER SKA JAG UTGÅ FRÅN ATT DEN ALLTID FINNS NU, MEN ATT DET
-  #EV. KAN VARA SÅ ATT DEN IBLAND ÄR TOM?
+
 
 require 'logger'
 require 'fileutils'
@@ -65,19 +61,33 @@ else
   source = result[1]
 end
 
-# If you want the source file revealed in Finder, uncomment this
-=begin
-script = "tell application \"Finder\" to reveal (POSIX file \"#{source}\")"
-`osascript -e '#{script}'`
-script = "tell application \"Finder\" to activate"
-`osascript -e '#{script}'`
-=end
+
 
 # Open the source file (Uncomment the option that suits you best.)
 
-# TextMate
-%x{mate #{source}}
+#%x{open #{source}}     # Default application
 
+%x{mate #{source}}      # TextMate
 
+#%x{mvim #{source}}     # MacVim
 
+#%x{bbedit #{source}}   # BBEdit
 
+#%x{open -a TheApplication #{source}}     # Replace AnApplication with the application you want to use
+
+# %x{open -a RubyMine #{source}}    # RubyMine (for more advanced options,
+          # see https://www.jetbrains.com/ruby/webhelp/working-with-rubymine-features-from-command-line.html )
+
+# Default application, using Finder to open it
+=begin
+script = "tell application \"Finder\" to open (POSIX file \"#{source}\")"
+%x{osascript -e '#{script}'}
+=end
+
+# Show the file in Finder
+=begin
+script = "tell application \"Finder\" to reveal (POSIX file \"#{source}\")"
+%x{osascript -e '#{script}'}
+script = "tell application \"Finder\" to activate"
+%x{osascript -e '#{script}'}
+=end
