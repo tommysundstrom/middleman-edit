@@ -5,7 +5,7 @@ middleman-edit
 
 Works both with the development server and on the final site.
 
-Use Alfred (http://www.alfredapp.com/), or any other of numerous options to run this script from a hotkey. Or
+Use [Alfred](http://www.alfredapp.com/), or any other of numerous options to run this script from a hotkey. Or
  call it from the command line.
 
 
@@ -20,4 +20,4 @@ For this script to work, there must be a meta tag with the location of the sourc
 ## Dependencies
 
 * Uses AppleScript, so works only on Mac
-* (Terminal Notifier)[http://rubygems.org/gems/terminal-notifier]
+* [Terminal Notifier](http://rubygems.org/gems/terminal-notifier)
