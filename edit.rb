@@ -14,6 +14,7 @@ require 'logger'
 require 'fileutils'
 require 'pathname'
 require 'open-uri'
+require 'terminal-notifier'  # http://rubygems.org/gems/terminal-notifier
 
 # Setup logging
 logpath = File.expand_path('~/Library/Logs/Middleman/Edit/edit.log')
@@ -22,6 +23,7 @@ $LOG = Logger.new(logpath, 'daily')
 $LOG.level = Logger::DEBUG
 $LOG.info '==============================================================='
 $LOG.info 'STARTING middleman-edit'
+
 
 # Chrome version
 # (Code for other browsers can be found here:
@@ -33,10 +35,12 @@ $LOG.info "Trying to edit #{url}, from Chrome"
 # Strip \n
 url.chomp!
 
+
 # Get the page's html code
 html = ''
 open(url) do |f|
   html = f.read
+  TerminalNotifier.notify(url, :title => 'Middleman edit', :subtitle => "Unable to get page")
   raise "Unable to download #{url}" if html.empty?
 end
 
@@ -46,6 +50,7 @@ end
 result = html.match( /^\s*(<meta.*name\s*=\s*['"]source['"].*>)$/ )
 if result.nil?
   errmsg = "No reference to a Middleman source file in page #{url} "
+  TerminalNotifier.notify(url, :title => 'Middleman edit', :subtitle => "Page contains no source file reference to a Middleman source file")
   $LOG.warn errmsg
   raise errmsg
 else
@@ -54,6 +59,7 @@ end
 
 result = meta_source_tag.match( /content\s*=\s*['"](.*?)['"]/ )
 if result.nil?
+  TerminalNotifier.notify(url, :title => 'Middleman edit', :subtitle => "Unable to extract content from source tag")
   raise "Found source meta for #{url}, can not extract content" if source.empty?
 else
   source = result[1]
@@ -67,7 +73,11 @@ script = "tell application \"Finder\" to activate"
 `osascript -e '#{script}'`
 =end
 
-# Open the source file with TextMate
+# Open the source file (Uncomment the option that suits you best.)
+
+# TextMate
 %x{mate #{source}}
+
+
 
 
