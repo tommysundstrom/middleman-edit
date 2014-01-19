@@ -103,7 +103,7 @@ end
 
 # Open the source file (Uncomment the option that suits you best.)
 TerminalNotifier.notify(source, :title => 'Middleman edit', :subtitle => "Opening source file")
-$LOG.info "Opening #{source}?"
+$LOG.info "Opening #{source}"
 
 %x{open #{source}}      # Default application
 
